@@ -33,6 +33,7 @@ export default function SellerDashboard() {
   const [newWaste, setNewWaste] = useState({
     waste_type: "",
     quantity_kg: "",
+    price_per_kg: "",
     frequency: "",
     location: "",
     description: ""
@@ -74,7 +75,6 @@ export default function SellerDashboard() {
         ...wasteData,
         seller_id: user.email,
         seller_name: profile?.company_name || user.full_name,
-        price_per_kg: 1,
         status: "disponible",
         original_quantity: wasteData.quantity_kg
       });
@@ -85,6 +85,7 @@ export default function SellerDashboard() {
       setNewWaste({
         waste_type: "",
         quantity_kg: "",
+        price_per_kg: "",
         frequency: "",
         location: "",
         description: ""
@@ -334,6 +335,19 @@ export default function SellerDashboard() {
             </div>
 
             <div className="space-y-2">
+              <Label>Precio por kg (USD) *</Label>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                value={newWaste.price_per_kg}
+                onChange={(e) => setNewWaste({ ...newWaste, price_per_kg: parseFloat(e.target.value) || "" })}
+                placeholder="Ej: 1.50"
+                className="rounded-xl"
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label>Frecuencia de generación</Label>
               <Select
                 value={newWaste.frequency}
@@ -372,12 +386,6 @@ export default function SellerDashboard() {
               />
             </div>
 
-            <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
-              <p className="text-sm text-emerald-700">
-                <strong>Precio:</strong> $1.00 USD por kg (precio fijo de la plataforma)
-              </p>
-            </div>
-
             <div className="flex gap-3 pt-4">
               <Button
                 variant="outline"
@@ -388,7 +396,7 @@ export default function SellerDashboard() {
               </Button>
               <Button
                 onClick={() => createWasteMutation.mutate(newWaste)}
-                disabled={!newWaste.waste_type || !newWaste.quantity_kg || createWasteMutation.isPending}
+                disabled={!newWaste.waste_type || !newWaste.quantity_kg || !newWaste.price_per_kg || createWasteMutation.isPending}
                 className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
               >
                 {createWasteMutation.isPending ? "Guardando..." : "Registrar"}

@@ -241,13 +241,9 @@ export default function Home() {
         <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-8 md:p-12 text-white text-center">
           <h2 className="text-3xl font-bold mb-4">Modelo Simple y Transparente</h2>
           <p className="text-emerald-100 text-lg mb-8 max-w-2xl mx-auto">
-            Precio fijo de $1 USD por kg de residuo. La plataforma solo cobra 1% de comisión por transacción.
+            Los vendedores establecen sus precios libremente. La plataforma solo cobra 1% de comisión por transacción.
           </p>
-          <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-6">
-              <p className="text-4xl font-bold mb-2">$1</p>
-              <p className="text-emerald-100">USD por kg</p>
-            </div>
+          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
             <div className="bg-white/10 backdrop-blur rounded-2xl p-6">
               <p className="text-4xl font-bold mb-2">1%</p>
               <p className="text-emerald-100">Comisión</p>

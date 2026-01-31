@@ -405,7 +405,7 @@ export default function BuyerDashboard() {
               {/* Price Breakdown */}
               <div className="space-y-3 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Subtotal ({purchaseQuantity} kg × $1.00)</span>
+                  <span className="text-slate-600">Subtotal ({purchaseQuantity} kg × ${selectedWaste.price_per_kg.toFixed(2)})</span>
                   <span className="font-medium">${calculatePurchase().subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
