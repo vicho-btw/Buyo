@@ -19,7 +19,8 @@ import {
   History,
   Filter,
   X,
-  Lock
+  Lock,
+  LogOut
 } from "lucide-react";
 import PendingApproval from "@/components/access/PendingApproval";
 import { createPageUrl } from "@/utils";
@@ -191,6 +192,14 @@ export default function BuyerDashboard() {
               <p className="text-xs text-slate-500">Panel de Comprador</p>
             </div>
           </div>
+          <Button
+            variant="outline"
+            onClick={() => base44.auth.logout()}
+            className="rounded-xl"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Cerrar Sesión
+          </Button>
         </div>
       </header>
 

@@ -17,7 +17,8 @@ import {
   Leaf,
   BarChart3,
   History,
-  Settings
+  Settings,
+  LogOut
 } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import StatsCard from "@/components/ui/StatsCard";
@@ -151,6 +152,13 @@ export default function SellerDashboard() {
             >
               <Plus className="w-4 h-4 mr-2" />
               Nuevo Residuo
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => base44.auth.logout()}
+              className="rounded-xl"
+            >
+              <LogOut className="w-4 h-4" />
             </Button>
           </div>
         </div>
