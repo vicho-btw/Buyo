@@ -16,19 +16,23 @@ import { wasteTypes } from "@/components/ui/WasteTypeIcon";
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
+  const pendingRole = localStorage.getItem("pending_role");
+  const [step, setStep] = useState(pendingRole ? 2 : 1);
   const [loading, setLoading] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState(false);
-  const [formData, setFormData] = useState({
-    role: "",
-    company_name: "",
-    industry_type: "",
-    location: "",
-    country: "",
-    phone: "",
-    description: "",
-    waste_types_needed: [],
-    permit_document_url: ""
+  const [formData, setFormData] = useState(() => {
+    const pendingRole = localStorage.getItem("pending_role");
+    return {
+      role: pendingRole || "",
+      company_name: "",
+      industry_type: "",
+      location: "",
+      country: "",
+      phone: "",
+      description: "",
+      waste_types_needed: [],
+      permit_document_url: ""
+    };
   });
 
   const industryOptions = {
@@ -100,6 +104,9 @@ export default function Onboarding() {
       }
 
       await base44.entities.UserProfile.create(profileData);
+      
+      // Limpiar el rol pendiente
+      localStorage.removeItem("pending_role");
 
       if (formData.role === "buyer_business") {
         navigate(createPageUrl("BuyerDashboard"));
@@ -151,7 +158,7 @@ export default function Onboarding() {
         </div>
 
         <AnimatePresence mode="wait">
-          {step === 1 && (
+          {formData.role && step === 1 && (
             <motion.div
               key="step1"
               initial={{ opacity: 0, y: 20 }}

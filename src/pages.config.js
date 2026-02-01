@@ -51,6 +51,7 @@ import BuyerDashboard from './pages/BuyerDashboard';
 import Home from './pages/Home';
 import Onboarding from './pages/Onboarding';
 import SellerDashboard from './pages/SellerDashboard';
+import Auth from './pages/Auth';
 
 
 export const PAGES = {
@@ -58,6 +59,7 @@ export const PAGES = {
     "Home": Home,
     "Onboarding": Onboarding,
     "SellerDashboard": SellerDashboard,
+    "Auth": Auth,
 }
 
 export const pagesConfig = {

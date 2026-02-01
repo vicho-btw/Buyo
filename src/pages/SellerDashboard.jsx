@@ -155,7 +155,7 @@ export default function SellerDashboard() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => base44.auth.logout(createPageUrl("Home"))}
+              onClick={() => base44.auth.logout(createPageUrl("Auth"))}
               className="rounded-xl"
             >
               <LogOut className="w-4 h-4" />
