@@ -194,7 +194,7 @@ export default function BuyerDashboard() {
           </div>
           <Button
             variant="outline"
-            onClick={() => base44.auth.logout()}
+            onClick={() => base44.auth.logout(createPageUrl("Home"))}
             className="rounded-xl"
           >
             <LogOut className="w-4 h-4 mr-2" />
