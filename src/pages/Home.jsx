@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import WasteCard from "@/components/marketplace/WasteCard";
+import GuestCTA from "@/components/access/GuestCTA";
 import { 
   Leaf, 
   ArrowRight, 
@@ -21,6 +24,14 @@ export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [checking, setChecking] = useState(true);
 
+  const { data: availableWastes = [] } = useQuery({
+    queryKey: ['guestWastes'],
+    queryFn: async () => {
+      const wastes = await base44.entities.OrganicWaste.filter({ status: "disponible" });
+      return wastes.slice(0, 6);
+    }
+  });
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -33,10 +44,10 @@ export default function Home() {
           
           if (profiles.length > 0) {
             const profile = profiles[0];
-            if (profile.role === "seller") {
-              navigate(createPageUrl("SellerDashboard"));
-            } else {
+            if (profile.role === "buyer_business") {
               navigate(createPageUrl("BuyerDashboard"));
+            } else {
+              navigate(createPageUrl("SellerDashboard"));
             }
           } else {
             navigate(createPageUrl("Onboarding"));
@@ -254,6 +265,30 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Guest Marketplace Preview */}
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
+            Explora el Marketplace
+          </h2>
+          <p className="text-slate-600">
+            Vista previa de residuos orgánicos disponibles
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          {availableWastes.map((waste) => (
+            <WasteCard 
+              key={waste.id} 
+              waste={waste}
+              showBuyButton={false}
+            />
+          ))}
+        </div>
+
+        <GuestCTA message="Crea una cuenta para comprar residuos orgánicos o publicar tus propios residuos" />
       </section>
 
       {/* CTA */}

@@ -18,8 +18,10 @@ import {
   BarChart3,
   History,
   Filter,
-  X
+  X,
+  Lock
 } from "lucide-react";
+import PendingApproval from "@/components/access/PendingApproval";
 import { createPageUrl } from "@/utils";
 import StatsCard from "@/components/ui/StatsCard";
 import WasteCard from "@/components/marketplace/WasteCard";
@@ -54,17 +56,23 @@ export default function BuyerDashboard() {
   });
 
   const { data: availableWastes = [] } = useQuery({
-    queryKey: ['availableWastes', filters],
+    queryKey: ['availableWastes', filters, profile?.country],
     queryFn: async () => {
       let query = { status: "disponible" };
       if (filters.waste_type) {
         query.waste_type = filters.waste_type;
       }
       const wastes = await base44.entities.OrganicWaste.filter(query);
-      return wastes.filter(w => 
-        !filters.min_quantity || w.quantity_kg >= parseFloat(filters.min_quantity)
-      );
-    }
+      
+      // Filter by buyer's country and min quantity
+      return wastes.filter(w => {
+        const countryMatch = profile?.country ? 
+          w.location?.toLowerCase().includes(profile.country.toLowerCase()) : true;
+        const quantityMatch = !filters.min_quantity || w.quantity_kg >= parseFloat(filters.min_quantity);
+        return countryMatch && quantityMatch;
+      });
+    },
+    enabled: !!profile
   });
 
   const { data: myTransactions = [] } = useQuery({
@@ -116,18 +124,29 @@ export default function BuyerDashboard() {
     }
   });
 
-  // Redirect to onboarding if no profile
+  // Redirect to onboarding if no profile or wrong role
   useEffect(() => {
-    if (user && !profileLoading && !profile) {
-      navigate(createPageUrl("Onboarding"));
+    if (user && !profileLoading) {
+      if (!profile) {
+        navigate(createPageUrl("Onboarding"));
+      } else if (profile.role !== "buyer_business") {
+        navigate(createPageUrl("SellerDashboard"));
+      } else if (!profile.onboarding_completed) {
+        navigate(createPageUrl("Onboarding"));
+      }
     }
   }, [user, profile, profileLoading, navigate]);
 
   const handleBuyClick = (waste) => {
+    if (profile?.approval_status !== "approved") {
+      return;
+    }
     setSelectedWaste(waste);
     setPurchaseQuantity(Math.min(100, waste.quantity_kg));
     setShowPurchaseDialog(true);
   };
+
+  const canBuy = profile?.approval_status === "approved";
 
   const totalPurchased = myTransactions
     .filter(t => t.status === "completada")
@@ -203,6 +222,11 @@ export default function BuyerDashboard() {
           </TabsList>
 
           <TabsContent value="marketplace" className="space-y-6">
+            {/* Approval Status */}
+            {profile?.approval_status !== "approved" && (
+              <PendingApproval status={profile?.approval_status} />
+            )}
+
             {/* Filters */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <div className="flex items-center gap-2 mb-4">
@@ -280,6 +304,7 @@ export default function BuyerDashboard() {
                       key={waste.id} 
                       waste={waste} 
                       onBuy={handleBuyClick}
+                      showBuyButton={canBuy}
                     />
                   ))}
                 </div>

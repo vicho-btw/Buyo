@@ -77,10 +77,17 @@ export default function WasteCard({ waste, onBuy, showBuyButton = true, classNam
           <p className="text-xs text-slate-500">USD / kg</p>
         </div>
         
-        {showBuyButton && waste.status === "disponible" && (
+        {showBuyButton && waste.status === "disponible" ? (
           <Button 
             onClick={() => onBuy(waste)}
             className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-6"
+          >
+            Comprar
+          </Button>
+        ) : waste.status === "disponible" && (
+          <Button 
+            disabled
+            className="bg-slate-200 text-slate-400 rounded-xl px-6 cursor-not-allowed"
           >
             Comprar
           </Button>

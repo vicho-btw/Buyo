@@ -93,10 +93,16 @@ export default function SellerDashboard() {
     }
   });
 
-  // Redirect to onboarding if no profile
+  // Redirect to onboarding if no profile or wrong role
   useEffect(() => {
-    if (user && !profileLoading && !profile) {
-      navigate(createPageUrl("Onboarding"));
+    if (user && !profileLoading) {
+      if (!profile) {
+        navigate(createPageUrl("Onboarding"));
+      } else if (profile.role === "buyer_business") {
+        navigate(createPageUrl("BuyerDashboard"));
+      } else if (!profile.onboarding_completed) {
+        navigate(createPageUrl("Onboarding"));
+      }
     }
   }, [user, profile, profileLoading, navigate]);
 
