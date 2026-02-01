@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Leaf, User, Factory, Building, ArrowRight } from "lucide-react";
@@ -11,9 +12,48 @@ export default function Auth() {
   const navigate = useNavigate();
   const [mode, setMode] = useState("welcome"); // welcome, register
   const [selectedRole, setSelectedRole] = useState("");
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me().catch(() => null),
+    retry: false
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: async () => {
+      if (!user) return null;
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      return profiles[0] || null;
+    },
+    enabled: !!user
+  });
+
+  useEffect(() => {
+    const checkAuthAndRedirect = async () => {
+      if (user && profile) {
+        // Usuario autenticado con perfil completo
+        if (profile.role === "buyer_business") {
+          navigate(createPageUrl("BuyerDashboard"));
+        } else {
+          navigate(createPageUrl("SellerDashboard"));
+        }
+      } else if (user && !profile) {
+        // Usuario autenticado sin perfil - ir a onboarding
+        navigate(createPageUrl("Onboarding"));
+      } else {
+        // No autenticado - mostrar pantalla de bienvenida
+        setCheckingAuth(false);
+      }
+    };
+
+    checkAuthAndRedirect();
+  }, [user, profile, navigate]);
 
   const handleLogin = () => {
-    base44.auth.redirectToLogin(createPageUrl("Home"));
+    // Redirigir a login de Base44, después volverá a Auth
+    window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
   };
 
   const handleRegister = () => {
@@ -25,9 +65,17 @@ export default function Auth() {
       // Guardar el rol seleccionado en localStorage temporalmente
       localStorage.setItem("pending_role", selectedRole);
       // Redirigir al registro de Base44
-      base44.auth.redirectToLogin(createPageUrl("Onboarding"));
+      window.location.href = '/login?next=' + encodeURIComponent(createPageUrl("Onboarding"));
     }
   };
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center">
+        <div className="animate-pulse text-emerald-600">Cargando...</div>
+      </div>
+    );
+  }
 
   if (mode === "welcome") {
     return (
